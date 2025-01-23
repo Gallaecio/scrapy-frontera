@@ -10,7 +10,8 @@ setup(
     maintainer   = 'Scrapinghub',
     packages     = find_packages(),
     install_requires=(
-        'frontera==0.7.1',
+        # 'frontera==0.7.1',
+        'frontera @ git+https://github.com/Gallaecio/frontera.git@modernize',
         'scrapy>=1.7.0',
     ),
     classifiers = [

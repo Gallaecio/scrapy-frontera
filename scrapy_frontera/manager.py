@@ -3,7 +3,7 @@ from .converters import RequestConverter, ResponseConverter
 from scrapy_frontera.core.manager import FrontierManager
 
 
-class ScrapyFrontierManager(object):
+class ScrapyFrontierManager:
 
     spider = None
 

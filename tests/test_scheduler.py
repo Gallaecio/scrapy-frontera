@@ -13,7 +13,7 @@ from scrapy.crawler import CrawlerRunner
 
 TEST_SETTINGS = {
     'SCHEDULER': 'scrapy_frontera.scheduler.FronteraScheduler',
-    'BACKEND': 'frontera.contrib.backends.memory.FIFO',
+    'BACKEND': 'scrapy_frontera._old_frontera.contrib.backends.memory.FIFO',
     'DOWNLOADER_MIDDLEWARES': {
         'scrapy_frontera.middlewares.SchedulerDownloaderMiddleware': 0,
     },
@@ -132,7 +132,7 @@ class FronteraSchedulerTest(TestCase):
                 ],
             )
 
-            with patch('frontera.contrib.backends.memory.MemoryBaseBackend.links_extracted') as mocked_links_extracted:
+            with patch('scrapy_frontera._old_frontera.contrib.backends.memory.MemoryBaseBackend.links_extracted') as mocked_links_extracted:
                 mocked_links_extracted.return_value = None
                 settings = Settings()
                 settings.setdict(TEST_SETTINGS, priority='cmdline')
@@ -153,7 +153,7 @@ class FronteraSchedulerTest(TestCase):
                 ],
             )
 
-            with patch('frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
+            with patch('scrapy_frontera._old_frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
                 mocked_schedule.return_value = None
                 settings = Settings()
                 settings.setdict(TEST_SETTINGS, priority='cmdline')
@@ -173,7 +173,7 @@ class FronteraSchedulerTest(TestCase):
                 ],
             )
 
-            with patch('frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
+            with patch('scrapy_frontera._old_frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
                 mocked_schedule.return_value = None
                 settings = Settings()
                 settings.setdict(TEST_SETTINGS, priority='cmdline')
@@ -198,7 +198,7 @@ class FronteraSchedulerTest(TestCase):
                 ],
             )
 
-            with patch('frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
+            with patch('scrapy_frontera._old_frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
                 mocked_schedule.return_value = None
                 settings = Settings()
                 settings.setdict(TEST_SETTINGS, priority='cmdline')
@@ -213,12 +213,13 @@ class FronteraSchedulerTest(TestCase):
 
     @defer.inlineCallbacks
     def test_callback_requests_slot_map(self):
+
         with patch('scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler') as mocked_handler:
             resp1 = Response(url='http://example.com')
             resp2 = Response(url='http://example2.com')
             self.setup_mocked_handler(mocked_handler, [resp1, resp2])
 
-            with patch('frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
+            with patch('scrapy_frontera._old_frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
                 mocked_schedule.return_value = None
                 settings = Settings()
                 settings.setdict(TEST_SETTINGS, priority='cmdline')
@@ -242,7 +243,7 @@ class FronteraSchedulerTest(TestCase):
             resp2 = Response(url='http://example2.com')
             self.setup_mocked_handler(mocked_handler, [resp1, resp2])
 
-            with patch('frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
+            with patch('scrapy_frontera._old_frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
                 mocked_schedule.return_value = None
                 settings = Settings()
                 settings.setdict(TEST_SETTINGS, priority='cmdline')
@@ -287,7 +288,7 @@ class FronteraSchedulerTest(TestCase):
         with patch('scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler') as mocked_handler:
             self.setup_mocked_handler(mocked_handler)
 
-            with patch('frontera.contrib.backends.memory.MemoryBaseBackend.add_seeds') as mocked_add_seeds:
+            with patch('scrapy_frontera._old_frontera.contrib.backends.memory.MemoryBaseBackend.add_seeds') as mocked_add_seeds:
                 mocked_add_seeds.return_value = None
                 settings = Settings()
                 settings.setdict(TEST_SETTINGS, priority='cmdline')
@@ -362,7 +363,7 @@ class FronteraSchedulerTest(TestCase):
                 ],
             )
 
-            with patch('frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
+            with patch('scrapy_frontera._old_frontera.contrib.backends.memory.MemoryDequeQueue.schedule') as mocked_schedule:
                 mocked_schedule.return_value = None
                 settings = Settings()
                 settings.setdict(TEST_SETTINGS, priority='cmdline')

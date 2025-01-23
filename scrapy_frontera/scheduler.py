@@ -16,7 +16,7 @@ class FronteraScheduler(Scheduler):
 
     @classmethod
     def from_crawler(cls, crawler):
-        obj = super(FronteraScheduler, cls).from_crawler(crawler)
+        obj = super().from_crawler(crawler)
         obj.crawler = crawler
         obj.frontier = None
         return obj
@@ -24,7 +24,7 @@ class FronteraScheduler(Scheduler):
     def next_request(self):
         if not self.has_pending_requests():
             self._get_requests_from_backend()
-        return super(FronteraScheduler, self).next_request()
+        return super().next_request()
 
     def is_frontera_request(self, request):
         """
@@ -33,7 +33,7 @@ class FronteraScheduler(Scheduler):
         if request.meta.get('cf_store', False) or get_callback_name(request) in self.frontier_requests_callbacks:
             if request.callback is None or getattr(request.callback, '__self__', None) is self.spider:
                 return True
-            raise ValueError('Request <{}>: frontera request callback must be a spider method.'.format(request))
+            raise ValueError(f'Request <{request}>: frontera request callback must be a spider method.')
         return False
 
     def process_spider_output(self, response, result, spider):
@@ -54,7 +54,7 @@ class FronteraScheduler(Scheduler):
             self.frontier.request_error(request=request, error=error_code)
 
     def open(self, spider):
-        super(FronteraScheduler, self).open(spider)
+        super().open(spider)
         frontera_settings = ScrapySettingsAdapter(spider.crawler.settings)
         frontera_settings.set_from_dict(getattr(spider, 'frontera_settings', {}))
         frontera_settings.set_from_dict(json.loads(getattr(spider, 'frontera_settings_json', '{}')))
@@ -74,7 +74,7 @@ class FronteraScheduler(Scheduler):
             self.frontier.start()
 
     def close(self, reason):
-        super(FronteraScheduler, self).close(reason)
+        super().close(reason)
         LOG.info('Finishing frontier (%s)' % reason)
         self.frontier.stop()
         return self.df.close(reason)
