@@ -1,5 +1,4 @@
 class BaseSchedulerMiddleware:
-
     def __init__(self, crawler):
         self.crawler = crawler
 
@@ -17,9 +16,11 @@ class SchedulerSpiderMiddleware(BaseSchedulerMiddleware):
         return self.scheduler.process_spider_output(response, result, spider)
 
     def process_start_requests(self, start_requests, spider):
-        if self.crawler.settings.getbool('FRONTERA_SCHEDULER_START_REQUESTS_TO_FRONTIER'):
+        if self.crawler.settings.getbool(
+            "FRONTERA_SCHEDULER_START_REQUESTS_TO_FRONTIER"
+        ):
             return []
-        if self.crawler.settings.getbool('FRONTERA_SCHEDULER_SKIP_START_REQUESTS'):
+        if self.crawler.settings.getbool("FRONTERA_SCHEDULER_SKIP_START_REQUESTS"):
             return []
         return start_requests
 

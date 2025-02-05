@@ -2,12 +2,12 @@
 scrapy-frontera changelog
 =========================
 
-0.3.0 (2025-01-DD)
+0.3.0 (unreleased)
 ==================
 
 -   Drop Python 3.8 support, add Python 3.9+ support.
 
--   Set Scrapy 1.7.0 as the minimum Scrapy version.
+-   Require frontera 0.7.2+ (but < 0.8), Scrapy 2.7.0+ and w3lib 1.17.0+.
 
 
 Earlier releases
