@@ -14,7 +14,7 @@ class ScrapyFrontierManager:
         self.request_converter = RequestConverter(self.spider)
         self.response_converter = ResponseConverter(self.spider, self.request_converter)
 
-    def __init__(self, settings):
+    def __init__(self, settings=None):
         self.manager = FrontierManager.from_settings(settings)
 
     def start(self):

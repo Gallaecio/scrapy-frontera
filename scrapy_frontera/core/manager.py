@@ -14,6 +14,7 @@ class FrontierManager(FronteraFrontierManager):
         the passed settings argument. If no settings is given,
         :ref:`frontier default settings <frontier-default-settings>` are used.
         """
+        settings = settings or Settings()
         Settings.object_from(settings)
         settings.set_from_dict(DEFAULT_SETTINGS)
         return super().from_settings(settings)
