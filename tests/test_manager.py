@@ -1,10 +1,10 @@
-import json
-
 from scrapy import Request, Spider, signals
 from scrapy.crawler import CrawlerRunner
 from scrapy.utils.test import get_crawler
-from scrapy_frontera.manager import ScrapyFrontierManager
 from twisted.internet.defer import inlineCallbacks
+
+from scrapy_frontera.manager import ScrapyFrontierManager
+
 
 @inlineCallbacks
 def test_add_seeds():
