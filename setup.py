@@ -11,13 +11,18 @@ setup(
     url="https://github.com/scrapinghub/scrapy-frontera",
     maintainer="Scrapinghub",
     packages=find_packages(),
+    python_requires=">=3.9",
     install_requires=(
         # 'frontera>=0.7.2,<0.8',
         "frontera[scrapy] @ git+https://github.com/scrapinghub/frontera.git@modernize",
         "scrapy>=2.7.0",
         "w3lib>=1.17.0",
     ),
-    python_requires=">=3.9",
+    extras_require={
+        "hcf": [
+            "hcf-backend @ git+https://github.com/scrapinghub/hcf-backend.git@latest-frontera"
+        ],
+    },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
