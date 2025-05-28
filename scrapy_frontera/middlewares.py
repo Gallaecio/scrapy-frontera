@@ -8,19 +8,37 @@ class BaseSchedulerMiddleware:
 
     @property
     def scheduler(self):
-        return self.crawler.engine.slot.scheduler
+        try:
+            # To be exposed as engine.scheduler as part of
+            # https://github.com/scrapy/scrapy/pull/6715
+            return self.crawler.engine._slot.scheduler
+        except AttributeError:  # Scrapy < 2.13.0
+            return self.crawler.engine.slot.scheduler
 
 
 class SchedulerSpiderMiddleware(BaseSchedulerMiddleware):
     def process_spider_output(self, response, result, spider):
         return self.scheduler.process_spider_output(response, result, spider)
 
-    def process_start_requests(self, start_requests, spider):
-        if self.crawler.settings.getbool(
-            "FRONTERA_SCHEDULER_START_REQUESTS_TO_FRONTIER"
+    async def process_spider_output_async(self, response, result, spider):
+        async for item_or_request in self.scheduler.process_spider_output_async(
+            response, result, spider
         ):
-            return []
-        if self.crawler.settings.getbool("FRONTERA_SCHEDULER_SKIP_START_REQUESTS"):
+            yield item_or_request
+
+    def _skip_start_requests(self):
+        return self.crawler.settings.getbool(
+            "FRONTERA_SCHEDULER_START_REQUESTS_TO_FRONTIER"
+        ) or self.crawler.settings.getbool("FRONTERA_SCHEDULER_SKIP_START_REQUESTS")
+
+    async def process_start(self, start):
+        if self._skip_start_requests():
+            return
+        async for item_or_request in start:
+            yield item_or_request
+
+    def process_start_requests(self, start_requests, spider):
+        if self._skip_start_requests():
             return []
         return start_requests
 

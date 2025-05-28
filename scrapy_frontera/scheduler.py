@@ -54,6 +54,18 @@ class FronteraScheduler(Scheduler):
             self.frontier.links_extracted(response.request, links)
             self.stats.inc_value("scrapyfrontera/links_extracted_count", len(links))
 
+    async def process_spider_output_async(self, response, result, spider):
+        links = []
+        async for element in result:
+            if isinstance(element, Request) and self.is_frontera_request(element):
+                links.append(element)
+            else:
+                yield element
+        self.frontier.page_crawled(response)
+        if links:
+            self.frontier.links_extracted(response.request, links)
+            self.stats.inc_value("scrapyfrontera/links_extracted_count", len(links))
+
     def process_exception(self, request, exception, spider):
         error_code = self._get_exception_code(exception)
         if self.is_frontera_request(request):

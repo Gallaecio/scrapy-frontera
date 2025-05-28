@@ -5,9 +5,22 @@ from scrapy.core.downloader.handlers.http11 import HTTP11DownloadHandler
 from scrapy.crawler import CrawlerRunner
 from scrapy.http import Response
 from scrapy.settings import Settings
+
+# This code seems to both work and cause tests to fail when running the entire
+# suite but not when running individual tests.
+from scrapy.settings.default_settings import TWISTED_REACTOR
+from scrapy.utils.misc import load_object
 from scrapy.utils.test import get_crawler
-from twisted.internet import defer
+from twisted.internet.asyncioreactor import AsyncioSelectorReactor
+from twisted.internet.defer import inlineCallbacks
 from twisted.trial.unittest import TestCase
+
+default_reactor = load_object(TWISTED_REACTOR)
+if default_reactor == AsyncioSelectorReactor:
+    from scrapy.utils.reactor import install_reactor
+
+    install_reactor("twisted.internet.asyncioreactor.AsyncioSelectorReactor")
+
 
 TEST_SETTINGS = {
     "SCHEDULER": "scrapy_frontera.scheduler.FronteraScheduler",
@@ -21,15 +34,21 @@ TEST_SETTINGS = {
 }
 
 
-class _TestSpider(Spider):
+class BaseSpider(Spider):
+    async def start(self):
+        for item_or_request in self.start_requests():
+            yield item_or_request
+
+    def start_requests(self):
+        yield Request("http://example.com")
+
+
+class _TestSpider(BaseSpider):
     name = "test"
     success = False
     success2 = False
     success3 = False
     error = False
-
-    def start_requests(self):
-        yield Request("http://example.com")
 
     def parse(self, response):
         self.success = True
@@ -62,13 +81,10 @@ class _TestSpider(Spider):
         self.success3 = True
 
 
-class _TestSpider2(Spider):
+class _TestSpider2(BaseSpider):
     name = "test"
     success = False
     success2 = False
-
-    def start_requests(self):
-        yield Request("http://example.com")
 
     def parse(self, response):
         self.success = True
@@ -78,12 +94,9 @@ class _TestSpider2(Spider):
         self.success2 = True
 
 
-class _TestSpider3(Spider):
+class _TestSpider3(BaseSpider):
     name = "test"
     success = 0
-
-    def start_requests(self):
-        yield Request("http://example.com")
 
     def parse(self, response):
         self.success += 1
@@ -123,7 +136,7 @@ class FronteraSchedulerTest(TestCase):
         else:
             mocked_handler.return_value = handler
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_start_requests(self):
         with patch(
             "scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler"
@@ -149,7 +162,7 @@ class FronteraSchedulerTest(TestCase):
                 self.assertTrue(crawler.spider.success2)
                 mocked_links_extracted.assert_not_called()
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_cf_store(self):
         with patch(
             "scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler"
@@ -173,7 +186,7 @@ class FronteraSchedulerTest(TestCase):
                 self.assertTrue(crawler.spider.success)
                 self.assertEqual(mocked_schedule.call_count, 1)
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_callback_requests_to_frontier(self):
         with patch(
             "scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler"
@@ -203,7 +216,7 @@ class FronteraSchedulerTest(TestCase):
                 self.assertFalse(crawler.spider.success2)
                 self.assertEqual(mocked_schedule.call_count, 1)
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_callback_requests_to_frontier_with_implicit_callback(self):
         with patch(
             "scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler"
@@ -233,7 +246,7 @@ class FronteraSchedulerTest(TestCase):
                 self.assertEqual(crawler.spider.success, 1)
                 self.assertEqual(mocked_schedule.call_count, 1)
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_callback_requests_slot_map(self):
         with patch(
             "scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler"
@@ -267,7 +280,7 @@ class FronteraSchedulerTest(TestCase):
                     frontera_request.meta[b"frontier_slot_prefix"], "myslot"
                 )
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_callback_requests_slot_map_with_num_slots(self):
         with patch(
             "scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler"
@@ -302,7 +315,7 @@ class FronteraSchedulerTest(TestCase):
                 )
                 self.assertEqual(frontera_request.meta[b"frontier_number_of_slots"], 5)
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_start_requests_to_frontier(self):
         with patch(
             "scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler"
@@ -328,7 +341,7 @@ class FronteraSchedulerTest(TestCase):
             self.assertTrue(crawler.spider.success)
             self.assertTrue(crawler.spider.success2)
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_start_requests_to_frontier_ii(self):
         with patch(
             "scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler"
@@ -352,7 +365,7 @@ class FronteraSchedulerTest(TestCase):
                 yield self.runner.crawl(crawler)
                 self.assertEqual(mocked_add_seeds.call_count, 1)
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_start_handle_errback(self):
         with patch(
             "scrapy.core.downloader.handlers.http11.HTTP11DownloadHandler"
@@ -376,7 +389,7 @@ class FronteraSchedulerTest(TestCase):
             self.assertTrue(crawler.spider.error)
             self.assertTrue(crawler.spider.success3)
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_start_handle_errback_with_cf_store(self):
         """
         Test that we get the expected result with errback cf_store
@@ -403,7 +416,7 @@ class FronteraSchedulerTest(TestCase):
             self.assertTrue(crawler.spider.error)
             self.assertTrue(crawler.spider.success3)
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def test_start_handle_errback_with_cf_store_ii(self):
         """
         Test that we scheduled cf_store request on backend queue
