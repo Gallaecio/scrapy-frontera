@@ -5,9 +5,6 @@ from scrapy.core.downloader.handlers.http11 import HTTP11DownloadHandler
 from scrapy.crawler import CrawlerRunner
 from scrapy.http import Response
 from scrapy.settings import Settings
-
-# This code seems to both work and cause tests to fail when running the entire
-# suite but not when running individual tests.
 from scrapy.utils.test import get_crawler
 from twisted.internet.defer import inlineCallbacks
 
