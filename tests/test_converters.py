@@ -2,7 +2,6 @@ import pytest
 from frontera.core.models import Request as FrontierRequest
 from scrapy import Request as ScrapyRequest
 from scrapy import Spider, signals
-from scrapy.crawler import CrawlerRunner
 from scrapy.utils.test import get_crawler
 from twisted.internet.defer import inlineCallbacks
 
@@ -43,10 +42,7 @@ def test_to_frontier(input_request, expected_request):
 
     crawler = get_crawler(TestSpider)
     crawler.signals.connect(spider_open, signal=signals.spider_opened)
-    runner = CrawlerRunner()
-    yield runner.crawl(crawler)
-
-    runner.stop()
+    yield crawler.crawl()
 
     assert len(actual_requests) == 1
     actual_request = actual_requests[0]

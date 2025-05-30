@@ -2,7 +2,6 @@ from unittest.mock import patch
 
 from scrapy import Request, Spider
 from scrapy.core.downloader.handlers.http11 import HTTP11DownloadHandler
-from scrapy.crawler import CrawlerRunner
 from scrapy.http import Response
 from scrapy.settings import Settings
 from scrapy.utils.test import get_crawler
@@ -144,7 +143,7 @@ def test_start_requests():
             settings = Settings()
             settings.setdict(TEST_SETTINGS, priority="cmdline")
             crawler = get_crawler(_TestSpider, settings)
-            yield crawler.crawl(crawler)
+            yield crawler.crawl()
             assert crawler.spider.success
             assert crawler.spider.success2
             mocked_links_extracted.assert_not_called()
@@ -167,9 +166,7 @@ def test_cf_store():
             settings = Settings()
             settings.setdict(TEST_SETTINGS, priority="cmdline")
             crawler = get_crawler(_TestSpider, settings)
-
-            runner = CrawlerRunner()
-            yield runner.crawl(crawler)
+            yield crawler.crawl()
             assert crawler.spider.success
             assert mocked_schedule.call_count == 1
 
@@ -196,9 +193,7 @@ def test_callback_requests_to_frontier():
                 }
             )
             crawler = get_crawler(_TestSpider2, settings)
-
-            runner = CrawlerRunner()
-            yield runner.crawl(crawler)
+            yield crawler.crawl()
             assert crawler.spider.success
             assert not crawler.spider.success2
             assert mocked_schedule.call_count == 1
@@ -227,9 +222,7 @@ def test_callback_requests_to_frontier_with_implicit_callback():
                 }
             )
             crawler = get_crawler(_TestSpider3, settings)
-
-            runner = CrawlerRunner()
-            yield runner.crawl(crawler)
+            yield crawler.crawl()
             assert crawler.spider.success == 1
             assert mocked_schedule.call_count == 1
 
@@ -254,9 +247,7 @@ def test_callback_requests_slot_map():
                 }
             )
             crawler = get_crawler(_TestSpider3, settings)
-
-            runner = CrawlerRunner()
-            yield runner.crawl(crawler)
+            yield crawler.crawl()
             assert crawler.spider.success == 1
             assert mocked_schedule.call_count == 1
             frontera_request = mocked_schedule.call_args_list[0][0][0][0][2]
@@ -286,9 +277,7 @@ def test_callback_requests_slot_map_with_num_slots():
                 }
             )
             crawler = get_crawler(_TestSpider3, settings)
-
-            runner = CrawlerRunner()
-            yield runner.crawl(crawler)
+            yield crawler.crawl()
             assert crawler.spider.success == 1
             assert mocked_schedule.call_count == 1
             frontera_request = mocked_schedule.call_args_list[0][0][0][0][2]
@@ -316,9 +305,7 @@ def test_start_requests_to_frontier():
             }
         )
         crawler = get_crawler(_TestSpider, settings)
-
-        runner = CrawlerRunner()
-        yield runner.crawl(crawler)
+        yield crawler.crawl()
         assert crawler.spider.success
         assert crawler.spider.success2
 
@@ -341,9 +328,7 @@ def test_start_requests_to_frontier_ii():
             )
 
             crawler = get_crawler(_TestSpider, settings)
-
-            runner = CrawlerRunner()
-            yield runner.crawl(crawler)
+            yield crawler.crawl()
             assert mocked_add_seeds.call_count == 1
 
 
@@ -362,9 +347,7 @@ def test_start_handle_errback():
         settings = Settings()
         settings.setdict(TEST_SETTINGS, priority="cmdline")
         crawler = get_crawler(_TestSpider, settings)
-
-        runner = CrawlerRunner()
-        yield runner.crawl(crawler)
+        yield crawler.crawl()
         assert crawler.spider.success
         assert not crawler.spider.success2
         # assert crawler.spider.error
@@ -389,9 +372,7 @@ def test_start_handle_errback_with_cf_store():
         settings = Settings()
         settings.setdict(TEST_SETTINGS, priority="cmdline")
         crawler = get_crawler(_TestSpider, settings)
-
-        runner = CrawlerRunner()
-        yield runner.crawl(crawler)
+        yield crawler.crawl()
         assert crawler.spider.success
         assert not crawler.spider.success2
         assert crawler.spider.error
@@ -420,9 +401,7 @@ def test_start_handle_errback_with_cf_store_ii():
             settings = Settings()
             settings.setdict(TEST_SETTINGS, priority="cmdline")
             crawler = get_crawler(_TestSpider, settings)
-
-            runner = CrawlerRunner()
-            yield runner.crawl(crawler)
+            yield crawler.crawl()
             assert crawler.spider.success
             assert not crawler.spider.success2
             assert crawler.spider.error
