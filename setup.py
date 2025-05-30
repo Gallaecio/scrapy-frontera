@@ -18,11 +18,6 @@ setup(
         "scrapy>=2.7.0",
         "w3lib>=1.17.0",
     ),
-    extras_require={
-        "hcf": [
-            "hcf-backend @ git+https://github.com/scrapinghub/hcf-backend.git@latest-frontera"
-        ],
-    },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",

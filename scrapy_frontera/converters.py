@@ -22,7 +22,11 @@ class RequestConverter(BaseRequestConverter):
         self.spider = spider
         crawler = spider.crawler
         if hasattr(crawler, "request_fingerprinter"):
-            self.request_fingerprint = crawler.request_fingerprinter.fingerprint
+            self.request_fingerprint = (
+                lambda *args, **kwargs: crawler.request_fingerprinter.fingerprint(
+                    *args, **kwargs
+                ).hex()
+            )
         else:
             from scrapy.utils.request import request_fingerprint
 
