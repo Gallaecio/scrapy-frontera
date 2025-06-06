@@ -13,8 +13,7 @@ setup(
     packages=find_packages(),
     python_requires=">=3.9",
     install_requires=(
-        # 'frontera>=0.7.2,<0.8',
-        "frontera[scrapy] @ git+https://github.com/scrapinghub/frontera.git@modernize",
+        "frontera>=0.7.2,<0.8",
         "scrapy>=2.7.0",
         "w3lib>=1.17.0",
     ),
